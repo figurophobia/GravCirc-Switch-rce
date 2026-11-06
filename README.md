@@ -1,0 +1,131 @@
+# Gravity Circuit Switch RCE
+
+Userland code execution on Nintendo Switch through Gravity Circuit save data.
+
+The save replaces the game's entry point with a networked Lua REPL and FTP server.
+No cartridge modification, no romfs patches, no title update needed.
+The exploit runs entirely in userland through the game's own LuaJIT runtime and SDK.
+
+![Screenshot](docs/screenshot.jpg)
+
+## What this is
+
+**A proof of concept, not a product.** This is a research and instrumentation tool
+that demonstrates save data exploitation in LÖVE engine games on Nintendo Switch.
+
+- Verified on Switch 1 hardware (Gravity Circuit v1.0, title `01008D9019128000`)
+- Should work on Switch 2 as well, since the vulnerability is in the game's runtime,
+  not the console firmware. I haven't been able to test it because I don't have access
+  to a Switch 2, but there's no technical reason it wouldn't work if the save data
+  can be transferred (e.g. via Nintendo's official save transfer)
+- Userland only, does not bypass DRM, does not modify game files
+- Entirely based on [balatro-switch-rce](https://github.com/Luminger/balatro-switch-rce)
+  by Luminger, we adapted their JankFFI gadget chain and architecture for a different game
+
+## Why this works
+
+Gravity Circuit is a [LÖVE](https://love2d.org/) game. LÖVE uses PhysFS to mount
+directories into a virtual filesystem. When the game calls `love.filesystem.setIdentity()`
+with `appendidentity = false`, the save directory is **prepended** to the search path.
+
+This means any file placed in the save directory shadows the game's own version:
+
+```
+Search order:  save:/.Gravity Circuit/  →  game romfs
+               ↑ our main.lua wins
+```
+
+Since `conf.lua` is loaded before the save is mounted, it cannot be shadowed — but
+`main.lua` can, and that's all we need.
+
+## What you get
+
+- **Status console** — on-screen overlay showing boot log, resolved addresses, and service status
+- **RPC** on TCP `9026` — networked Lua REPL (use `tools/rpc.py`)
+- **FTP** on TCP `5000`/`5001` — read/write access to the LÖVE virtual filesystem
+- **Savedata log** — `gc_log.txt` in the save directory
+- **Native call support** — full-ABI AArch64 calls via JankFFI gadget chain
+
+### Native call chain
+
+On Switch, LuaJIT's `ffi.C` and `ffi.load` do not work (no `dlsym`).
+Native SDK calls are dispatched through a gadget chain adapted from
+[balatro-switch-rce](https://github.com/Luminger/balatro-switch-rce):
+
+```
+BC_FUNCC hijack → thunk → launder → fiber_switch → ctx_restore → capture gadget → fiber_switch back
+```
+
+Module bases are resolved at runtime:
+- `jit.util.funcinfo(love.graphics.present).addr` anchors the main binary
+- GOT memcpy entry resolves the SDK base
+- Both confirmed via MOD0 magic bytes
+
+All offsets are in `src/gc/offsets.lua` (SDK 14.3.1.0).
+
+### LuaJIT build defects
+
+The Switch build of LuaJIT 2.1.0-beta3 has the same defects documented in
+[balatro-switch-rce](https://github.com/Luminger/balatro-switch-rce):
+`lj_vm_ffi_call` linked onto padding, broken 64-bit literals, broken cdata equality,
+and fatal metatype Lua metamethods. The gadget chain works around all of these.
+
+## Build
+
+No build step required. The source files are pure Lua, deployed directly.
+
+To create a release ZIP:
+```sh
+cd src && zip -r ../GC-release.zip gc/ gc/main.lua
+```
+
+## Install
+
+1. Export the current Gravity Circuit save with [JKSV](https://github.com/J-D-K/JKSV)
+   (this creates a ZIP with `.nx_save_meta.bin`)
+2. Add the contents of the release ZIP into the JKSV export under `.Gravity Circuit/`
+3. Copy the modified ZIP to `JKSV/Gravity Circuit/` on the SD card
+4. Restore with JKSV
+
+⚠️ **The restore replaces the current Gravity Circuit save.**
+
+## Live use
+
+```sh
+# RPC — execute Lua on the console
+python3 tools/rpc.py <console-ip> 'return 2+2'
+
+# FTP — browse the virtual filesystem
+curl --disable-epsv ftp://<console-ip>:5000/
+curl --disable-epsv ftp://<console-ip>:5000/gc_log.txt
+```
+
+RPC and FTP are unauthenticated and unencrypted. Use on a trusted network only.
+
+## Other LÖVE games
+
+The save shadowing vulnerability affects any LÖVE game that uses `appendidentity = false`.
+We have confirmed the same entry vector works on **Kingdom Rush** (LÖVE 0.10.2) on PC,
+but Switch offsets and gadget adaptation are still in progress. The architecture is
+designed to support multiple games through per-game offset tables in `offsets.lua`.
+
+## Acknowledgements
+
+This project is **heavily based on** [balatro-switch-rce](https://github.com/Luminger/balatro-switch-rce)
+by [Luminger](https://github.com/Luminger). The JankFFI dispatch chain, BC_FUNCC hijack
+technique, module resolution strategy, FTP server, RPC protocol, and overall architecture
+were all developed by Luminger for Balatro. We adapted their work for Gravity Circuit
+(different SDK version, different offsets, different gadget byte patterns) and confirmed
+that the same class of vulnerability exists across multiple LÖVE games on Switch.
+
+Without balatro-switch-rce, this project would not exist. Full credit to Luminger
+for the original research and implementation.
+
+## Legal
+
+This software is provided for educational and research purposes. Use of this software
+may violate Nintendo's terms of service and can get a console banned.
+
+## License
+
+GPL-3.0 — see [LICENSE](LICENSE).
