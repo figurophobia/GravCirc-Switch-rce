@@ -99,7 +99,9 @@ copy to `JKSV/Gravity Circuit/` and restore.
 
 The release ZIP is ready to import with JKSV, no extra steps needed:
 
-1. Download the latest release ZIP from the [releases page](https://github.com/figurophobia/GravCirc-Switch-rce/releases)
+1. Download the latest release ZIP (`GC-v1.1.zip`). The same ZIP works on
+   Gravity Circuit **1.0.0 and 1.2.1**; the launcher picks the matching offset
+   profile at boot
 2. Copy it to `JKSV/Gravity Circuit/` on the SD card
 3. Open JKSV, select Gravity Circuit, restore from the ZIP
 

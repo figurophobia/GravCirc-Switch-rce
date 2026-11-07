@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import jksv_meta
+import re
 import subprocess
 import shutil
 import sys
@@ -55,6 +56,12 @@ def collect() -> dict[str, Path]:
     return out
 
 
+def profiles() -> list[str]:
+    """Game-build offset profiles embedded in gc/offsets.lua."""
+    text = (SRC / "gc" / "offsets.lua").read_text(encoding="utf-8")
+    return re.findall(r'\bid\s*=\s*"([^"]+)"', text)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -66,6 +73,11 @@ def main() -> int:
     print(f"== collect: {len(files)} files")
     for rel, path in sorted(files.items()):
         print(f"    {rel} ({path.stat().st_size}B)")
+
+    ids = profiles()
+    if not ids:
+        raise SystemExit("no offset profiles found in src/gc/offsets.lua")
+    print(f"== profiles: {', '.join(ids)}")
 
     print("== validate")
     syntax_check(sorted(set(files.values())))
@@ -99,6 +111,7 @@ def main() -> int:
                 raise SystemExit(f"packed {rel} differs from source")
 
     print(f"  {args.out}: {args.out.stat().st_size}B")
+    print(f"  supports: {', '.join(ids)} (selected at boot by present signature)")
     print(f"  generated JKSV {len(metadata)}-byte metadata; NO account UID")
     print(f"  WARNING: JKSV restore wipes Gravity Circuit save data")
     for rel in sorted(files):
