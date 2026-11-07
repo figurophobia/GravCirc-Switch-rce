@@ -88,7 +88,7 @@ and fatal metatype Lua metamethods. The gadget chain works around all of these.
 ## Build
 
 ```sh
-python3 build.py -o GC-v1.0.zip
+python3 build.py -o GC-v1.1.zip
 ```
 
 This generates the JKSV metadata (`.nx_save_meta.bin`) and packs the full
@@ -99,7 +99,7 @@ copy to `JKSV/Gravity Circuit/` and restore.
 
 The release ZIP is ready to import with JKSV, no extra steps needed:
 
-1. Download `GC-v1.0.zip` from the [releases page](https://github.com/figurophobia/GravCirc-Switch-rce/releases)
+1. Download the latest release ZIP from the [releases page](https://github.com/figurophobia/GravCirc-Switch-rce/releases)
 2. Copy it to `JKSV/Gravity Circuit/` on the SD card
 3. Open JKSV, select Gravity Circuit, restore from the ZIP
 
@@ -109,7 +109,7 @@ The release ZIP is ready to import with JKSV, no extra steps needed:
 <summary>Building the ZIP yourself</summary>
 
 ```sh
-python3 build.py -o GC-v1.0.zip
+python3 build.py -o GC-v1.1.zip
 ```
 
 The script generates the JKSV metadata (`.nx_save_meta.bin`) automatically,
