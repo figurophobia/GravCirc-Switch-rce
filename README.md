@@ -81,23 +81,31 @@ cd src && cp gc/main.lua ./main.lua && zip -r ../GC-release.zip main.lua gc/ && 
 
 ## Install
 
-1. Export the current Gravity Circuit save with [JKSV](https://github.com/J-D-K/JKSV)
-   (this creates a ZIP with `.nx_save_meta.bin`)
-2. Extract the release ZIP into the `.Gravity Circuit/` folder inside the JKSV export:
-   ```
-   your-jksv-export.zip
-   ├── .nx_save_meta.bin
-   └── .Gravity Circuit/
-       ├── main.lua          ← entry point (shadows the game's main.lua)
-       └── gc/               ← exploit modules
-           ├── app.lua
-           ├── offsets.lua
-           └── ...
-   ```
-3. Copy the modified ZIP to `JKSV/Gravity Circuit/` on the SD card
-4. Restore with JKSV
+The release ZIP is ready to import with JKSV, no extra steps needed:
+
+1. Download `GC-v1.0.zip` from the [releases page](https://github.com/figurophobia/GravCirc-Switch-rce/releases)
+2. Copy it to `JKSV/Gravity Circuit/` on the SD card
+3. Open JKSV, select Gravity Circuit, restore from the ZIP
 
 ⚠️ **The restore replaces the current Gravity Circuit save.**
+
+<details>
+<summary>Building the ZIP yourself</summary>
+
+If you want to build it from source instead of using the release:
+
+1. Export the current Gravity Circuit save with JKSV (to get `.nx_save_meta.bin`)
+2. Add `main.lua` and `gc/` into `.Gravity Circuit/` inside the export:
+   ```
+   your-zip.zip
+   ├── .nx_save_meta.bin
+   └── .Gravity Circuit/
+       ├── main.lua          ← entry point
+       └── gc/               ← exploit modules
+   ```
+3. Copy to `JKSV/Gravity Circuit/` and restore
+
+</details>
 
 ## Live use
 
