@@ -17,10 +17,9 @@ that demonstrates save data exploitation in LÖVE engine games on Nintendo Switc
 - Supports both Gravity Circuit v1.0 and v1.2.1 (the current eShop update). The
   launcher selects the right offset profile at runtime by matching the code
   signature of `love.graphics.present`, so both builds work from the same save
-- Should work on Switch 2 as well, since the vulnerability is in the game's runtime,
-  not the console firmware. I haven't been able to test it because I don't have access
-  to a Switch 2, but there's no technical reason it wouldn't work if the save data
-  can be transferred (e.g. via Nintendo's official save transfer)
+- Confirmed working on Switch 2 by u/mari0boy with the same save and ZIP, since
+  the vulnerability is in the game's runtime, not the console firmware. The save
+  data still has to get onto the console somehow; on Switch 1 that is JKSV
 - Userland only, does not bypass DRM, does not modify game files
 - Entirely based on [balatro-switch-rce](https://github.com/Luminger/balatro-switch-rce)
   by Luminger, we adapted their JankFFI gadget chain and architecture for a different game
