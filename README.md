@@ -76,14 +76,24 @@ No build step required. The source files are pure Lua, deployed directly.
 
 To create a release ZIP:
 ```sh
-cd src && zip -r ../GC-release.zip gc/ gc/main.lua
+cd src && cp gc/main.lua ./main.lua && zip -r ../GC-release.zip main.lua gc/ && rm main.lua
 ```
 
 ## Install
 
 1. Export the current Gravity Circuit save with [JKSV](https://github.com/J-D-K/JKSV)
    (this creates a ZIP with `.nx_save_meta.bin`)
-2. Add the contents of the release ZIP into the JKSV export under `.Gravity Circuit/`
+2. Extract the release ZIP into the `.Gravity Circuit/` folder inside the JKSV export:
+   ```
+   your-jksv-export.zip
+   ├── .nx_save_meta.bin
+   └── .Gravity Circuit/
+       ├── main.lua          ← entry point (shadows the game's main.lua)
+       └── gc/               ← exploit modules
+           ├── app.lua
+           ├── offsets.lua
+           └── ...
+   ```
 3. Copy the modified ZIP to `JKSV/Gravity Circuit/` on the SD card
 4. Restore with JKSV
 
