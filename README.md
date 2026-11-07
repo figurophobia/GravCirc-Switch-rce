@@ -14,6 +14,9 @@ The exploit runs entirely in userland through the game's own LuaJIT runtime and 
 that demonstrates save data exploitation in LÖVE engine games on Nintendo Switch.
 
 - Verified on Switch 1 hardware (Gravity Circuit v1.0, title `01008D9019128000`)
+- Also supports Gravity Circuit v1.2.1 (the current eShop update). The launcher
+  selects the right offset profile at runtime by matching the code signature of
+  `love.graphics.present`, so both builds work from the same save
 - Should work on Switch 2 as well, since the vulnerability is in the game's runtime,
   not the console firmware. I haven't been able to test it because I don't have access
   to a Switch 2, but there's no technical reason it wouldn't work if the save data
@@ -62,6 +65,18 @@ Module bases are resolved at runtime:
 - Both confirmed via MOD0 magic bytes
 
 All offsets are in `src/gc/offsets.lua` (SDK 14.3.1.0).
+
+### Supported builds
+
+| Game version | Title version | `present` | `got_memcpy` | SDK module |
+| --- | --- | --- | --- | --- |
+| 1.0.0 | v0 | `0x239360` | `0x51a6e8` | 14.3.1.0 |
+| 1.2.1 | v655360 | `0x289c40` | `0x54d9e0` | 14.3.1.0 (byte-identical NSO) |
+
+The SDK module did not change between these two builds, so only the main-module
+anchors differ. `resolve.lua` tries every profile for the running game and picks
+the one whose `present_head` code signature matches. Adding support for another
+update only needs a new profile in `offsets.lua`.
 
 ### LuaJIT build defects
 
