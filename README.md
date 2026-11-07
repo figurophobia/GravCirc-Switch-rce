@@ -13,10 +13,10 @@ The exploit runs entirely in userland through the game's own LuaJIT runtime and 
 **A proof of concept, not a product.** This is a research and instrumentation tool
 that demonstrates save data exploitation in LÖVE engine games on Nintendo Switch.
 
-- Verified on Switch 1 hardware (Gravity Circuit v1.0, title `01008D9019128000`)
-- Also supports Gravity Circuit v1.2.1 (the current eShop update). The launcher
-  selects the right offset profile at runtime by matching the code signature of
-  `love.graphics.present`, so both builds work from the same save
+- Verified on Switch 1 hardware (Gravity Circuit v1.0 and v1.2.1, title `01008D9019128000`)
+- Supports both Gravity Circuit v1.0 and v1.2.1 (the current eShop update). The
+  launcher selects the right offset profile at runtime by matching the code
+  signature of `love.graphics.present`, so both builds work from the same save
 - Should work on Switch 2 as well, since the vulnerability is in the game's runtime,
   not the console firmware. I haven't been able to test it because I don't have access
   to a Switch 2, but there's no technical reason it wouldn't work if the save data
