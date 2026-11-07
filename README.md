@@ -72,12 +72,13 @@ and fatal metatype Lua metamethods. The gadget chain works around all of these.
 
 ## Build
 
-No build step required. The source files are pure Lua, deployed directly.
-
-To create a release ZIP:
 ```sh
-cd src && cp gc/main.lua ./main.lua && zip -r ../GC-release.zip main.lua gc/ && rm main.lua
+python3 build.py -o GC-v1.0.zip
 ```
+
+This generates the JKSV metadata (`.nx_save_meta.bin`) and packs the full
+archive — no exported save or account data needed. The ZIP is ready to
+copy to `JKSV/Gravity Circuit/` and restore.
 
 ## Install
 
