@@ -93,18 +93,13 @@ The release ZIP is ready to import with JKSV, no extra steps needed:
 <details>
 <summary>Building the ZIP yourself</summary>
 
-If you want to build it from source instead of using the release:
+```sh
+python3 build.py -o GC-v1.0.zip
+```
 
-1. Export the current Gravity Circuit save with JKSV (to get `.nx_save_meta.bin`)
-2. Add `main.lua` and `gc/` into `.Gravity Circuit/` inside the export:
-   ```
-   your-zip.zip
-   ├── .nx_save_meta.bin
-   └── .Gravity Circuit/
-       ├── main.lua          ← entry point
-       └── gc/               ← exploit modules
-   ```
-3. Copy to `JKSV/Gravity Circuit/` and restore
+The script generates the JKSV metadata (`.nx_save_meta.bin`) automatically,
+runs syntax checks, and packs everything into a ready-to-import archive.
+No Switch, no exported save, no manual steps needed.
 
 </details>
 
